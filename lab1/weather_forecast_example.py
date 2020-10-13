@@ -22,31 +22,42 @@ configuration = {
 circuit = TkCircuit(configuration)
 owm = pyowm.OWM(key)
 
-location = "Krakow"
+location = ''
+
+weather_map = {
+    'Thunderstorm': 50,
+    'Drizzle': 50,
+    'Rain': 50,
+    'Snow': 50,
+    'Clouds': 10,
+    'Mist': 10,
+    'Smoke': 10,
+    'Dust': 10,
+    'Haze': 10,
+    'Fog': 10,
+    'Ash': 10,
+    'Squall': 10,
+    'Tornado': 10,
+    'Clear': -70
+}
+
+location_map = {
+    '': 'Krakow',
+    'Krakow': 'Istanbul',
+    'Istanbul': 'Stockholm',
+    'Stockholm': 'Istanbul'
+}
 
 
-def get_servo_angle(location):
-    weather_status = owm.weather_manager().weather_at_place(location).weather.status
-    print(weather_status)
-    if weather_status == "Clear":
-        return -70
-    elif weather_status == "Few clouds":
-        return -30
-    elif weather_status == "Clouds":
-        return 10
-    elif weather_status == "Rain":
-        return 50
+def get_servo_angle(current_location):
+    weather_status = owm.weather_manager().weather_at_place(current_location).weather.status
+    return weather_map[weather_status]
 
 
 def change_location():
     global location
-    if location == "Krakow":
-        location = "Istanbul"
-    elif location == "Istanbul":
-        location = "Stockholm"
-    elif location == "Stockholm":
-        location = "Istanbul"
-    print(location)
+    location = location_map[location]
+    print("New location: " + location)
 
 
 @circuit.run
@@ -57,9 +68,9 @@ def main():
     servo1 = AngularServo(17, min_angle=-90, max_angle=90)
     button_upper = Button(12)
 
+    change_location()
     button_upper.when_activated = change_location
 
     while True:
-        for x in range(-90, 70):
-            servo1.angle = get_servo_angle(location)
-            sleep(0.1)
+        servo1.angle = get_servo_angle(location)
+        sleep(0.1)
