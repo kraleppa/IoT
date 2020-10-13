@@ -1,4 +1,6 @@
 from VirtualCopernicusNG import TkCircuit
+import pyowm
+from lab1.api_key import key
 
 # initialize the circuit inside the
 
@@ -18,18 +20,46 @@ configuration = {
 }
 
 circuit = TkCircuit(configuration)
+owm = pyowm.OWM(key)
+
+location = "Krakow"
+
+
+def get_servo_angle(location):
+    weather_status = owm.weather_manager().weather_at_place(location).weather.status
+    print(weather_status)
+    if weather_status == "Clear":
+        return -70
+    elif weather_status == "Few clouds":
+        return -30
+    elif weather_status == "Clouds":
+        return 10
+    elif weather_status == "Rain":
+        return 50
+
+
+def change_location():
+    global location
+    if location == "Krakow":
+        location = "Istanbul"
+    elif location == "Istanbul":
+        location = "Stockholm"
+    elif location == "Stockholm":
+        location = "Istanbul"
+    print(location)
 
 
 @circuit.run
 def main():
     from time import sleep
-    from gpiozero import AngularServo
+    from gpiozero import AngularServo, Button
 
     servo1 = AngularServo(17, min_angle=-90, max_angle=90)
+    button_upper = Button(12)
 
-    servo1.angle = -90
+    button_upper.when_activated = change_location
 
     while True:
-        for x in range(-90, 90):
-            servo1.angle = x
+        for x in range(-90, 70):
+            servo1.angle = get_servo_angle(location)
             sleep(0.1)

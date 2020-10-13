@@ -137,4 +137,5 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 /venv/
-/key.py
+/lab1/api_key.py
+/lab1/api_key.py
