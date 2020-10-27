@@ -52,14 +52,13 @@ def main():
     while True:
         command = sock.recv(10240).decode("utf-8").split(';')
         print(command)
-        if command[0] == floor and command[1] == room:
-            print(1)
-            if command[2] == 'lamp' and command[3] == '1':
-                print(2)
-                if command[4] == 'on':
-                    print(3)
-                    led.on()
-                elif command[4] == 'off':
-                    led.off()
-                elif command[4] == 'change':
-                    led.toggle()
+        if command[0] == floor or command[0] == '*':
+            if command[1] == room or command[1] == '*':
+                if command[2] == 'lamp' or command[2] == '*':
+                    if command[3] == '1' or command[3] == '*':
+                        if command[4] == 'on':
+                            led.on()
+                        elif command[4] == 'off':
+                            led.off()
+                        elif command[4] == 'change':
+                            led.toggle()
