@@ -44,10 +44,16 @@ def main():
     floor = 'f1'
     room = 'living_room'
 
+    def button2_pressed():
+        sock.sendto('f1;kitchen;lamp;1;change'.encode('utf-8'), (MCAST_GRP, MCAST_PORT))
+
     led = LED(21)
 
-    button = Button(11)
-    button.when_pressed = led.toggle
+    button1 = Button(11)
+    button1.when_pressed = led.toggle
+
+    button2 = Button(12)
+    button2.when_pressed = button2_pressed
 
     while True:
         command = sock.recv(10240).decode("utf-8").split(';')
