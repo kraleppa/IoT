@@ -28,15 +28,38 @@ def main():
     # now just write the code you would use on a real Raspberry Pi
 
     from gpiozero import LED, Button
-    from time import sleep
+    import socket
+    import struct
 
-    def button1_pressed():
-        led.toggle()
+    MCAST_GRP = '236.0.0.0'
+    MCAST_PORT = 3456
+
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    sock.bind(('', MCAST_PORT))
+    mreq = struct.pack("4sl", socket.inet_aton(MCAST_GRP), socket.INADDR_ANY)
+
+    sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
+
+    floor = 'f1'
+    room = 'kitchen'
 
     led = LED(21)
 
-    button1 = Button(11)
-    button1.when_pressed = button1_pressed
+    button = Button(11)
+    button.when_pressed = led.toggle
 
     while True:
-        sleep(0.1)
+        command = sock.recv(10240).decode("utf-8").split(';')
+        print(command)
+        if command[0] == floor and command[1] == room:
+            print(1)
+            if command[2] == 'lamp' and command[3] == '1':
+                print(2)
+                if command[4] == 'on':
+                    print(3)
+                    led.on()
+                elif command[4] == 'off':
+                    led.off()
+                elif command[4] == 'change':
+                    led.toggle()
