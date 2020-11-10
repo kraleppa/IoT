@@ -139,3 +139,4 @@ cython_debug/
 /venv/
 /lab1/api_key.py
 /lab1/api_key.py
+/lab3/other/org.eclipse.paho.mqtt.utility-1.0.0.jar
