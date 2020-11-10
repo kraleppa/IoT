@@ -46,6 +46,7 @@ def main():
 
         mqttc.subscribe("kraleppa/light/lobby")
         mqttc.subscribe("kraleppa/ZONE2/light")
+        mqttc.publish("kraleppa/service", "Light controller c4 is working properly", 0, False)
 
     def on_message(client, userdata, msg):
         print(msg.topic + " " + str(msg.payload))
@@ -57,6 +58,8 @@ def main():
     mqttc = mqtt.Client("kraleppa_c4")
     mqttc.on_message = on_message
     mqttc.on_connect = on_connect
+    mqttc.will_set("kraleppa/service", payload="Light controller c4 is not working", qos=0, retain=True)
+
 
     mqttc.connect("test.mosquitto.org", 1883, 60)
 
